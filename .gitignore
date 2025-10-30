@@ -21,5 +21,6 @@ env/
 
 # Local temp files
 .flask_pid
+local.db
 
 
