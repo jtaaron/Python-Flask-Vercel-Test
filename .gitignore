@@ -19,4 +19,7 @@ env/
 # Vercel local files
 .vercel
 
+# Local temp files
+.flask_pid
+
 
