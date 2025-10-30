@@ -1,9 +1,16 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, jsonify
 from datetime import datetime
 from sqlalchemy import create_engine, String, Boolean, DateTime
 from sqlalchemy.orm import sessionmaker, scoped_session, DeclarativeBase, Mapped, mapped_column
 from sqlalchemy.pool import NullPool
+
+from openai import OpenAI
+client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+
+
+
+
 
 def ensure_secret_key(app: Flask) -> None:
     # Prefer environment variable; fall back to a dev-safe default
@@ -67,40 +74,29 @@ def shutdown_session(exception=None):
 
 @app.route("/", methods=["GET"])
 def index():
-    db = SessionLocal()
-    todos = db.query(Todo).order_by(Todo.created_at.desc()).all()
-    return render_template("index.html", todos=todos)
+    # Render chat UI (no to-do list on frontend)
+    return render_template("index.html", response=None)
 
 
-@app.route("/add", methods=["POST"])
-def add():
-    from uuid import uuid4
-    title = request.form.get("title", "").strip()
-    if title:
-        db = SessionLocal()
-        db.add(Todo(id=str(uuid4()), title=title, done=False))
-        db.commit()
-    return redirect(url_for("index"))
+@app.route("/chat", methods=["POST"])
+def chat():
+    # Basic echo implementation; replace with AI/provider call as needed
+    prompt = request.form.get("prompt", "").strip()
+    if not prompt:
+        return redirect(url_for("index"))
+
+    response = client.responses.create(
+    model="gpt-5",
+    input=prompt
+    )
+    reply = response.output_text
+    return render_template("index.html", response=reply)
 
 
-@app.route("/toggle/<todo_id>", methods=["POST"])
-def toggle(todo_id: str):
-    db = SessionLocal()
-    todo = db.get(Todo, todo_id)
-    if todo:
-        todo.done = not todo.done
-        db.commit()
-    return redirect(url_for("index"))
+# To-do routes removed from frontend usage; endpoints not exposed in UI anymore
 
 
-@app.route("/delete/<todo_id>", methods=["POST"])
-def delete(todo_id: str):
-    db = SessionLocal()
-    todo = db.get(Todo, todo_id)
-    if todo:
-        db.delete(todo)
-        db.commit()
-    return redirect(url_for("index"))
+# (Optional) Keep existing DB model for future features
 
 
 if __name__ == "__main__":
