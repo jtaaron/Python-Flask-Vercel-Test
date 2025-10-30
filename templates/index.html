@@ -1,0 +1,45 @@
+{% extends 'layout.html' %}
+
+{% block title %}To‑Do List{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-md-10 col-lg-8">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <form action="{{ url_for('add') }}" method="post" class="d-flex gap-2 mb-3">
+          <input name="title" class="form-control form-control-lg" placeholder="Add a new task…" autocomplete="off" required>
+          <button class="btn btn-primary btn-lg" type="submit">Add</button>
+        </form>
+
+        {% if todos %}
+        <ul class="list-group list-group-flush">
+          {% for t in todos %}
+          <li class="list-group-item d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-3">
+              <form action="{{ url_for('toggle', todo_id=t.id) }}" method="post">
+                <button class="btn btn-outline-success btn-sm" type="submit" aria-label="Toggle">
+                  {% if t.done %}✓{% else %}&nbsp;{% endif %}
+                </button>
+              </form>
+              <span class="todo-title {% if t.done %}text-muted text-decoration-line-through{% endif %}">{{ t.title }}</span>
+            </div>
+            <form action="{{ url_for('delete', todo_id=t.id) }}" method="post">
+              <button class="btn btn-outline-danger btn-sm" type="submit">Delete</button>
+            </form>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <div class="text-center text-muted py-4">No tasks yet. Add your first task above.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-md-10 col-lg-8 text-center text-muted small mt-3">
+    Tasks are stored in your browser session (demo only).
+  </div>
+  </div>
+{% endblock %}
+
+

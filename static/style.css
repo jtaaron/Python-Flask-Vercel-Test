@@ -1,0 +1,14 @@
+body {
+  font-feature-settings: "kern" 1;
+}
+
+.todo-title {
+  font-size: 1.05rem;
+}
+
+.list-group-item {
+  padding-top: 0.9rem;
+  padding-bottom: 0.9rem;
+}
+
+
